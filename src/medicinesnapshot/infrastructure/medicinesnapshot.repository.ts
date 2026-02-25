@@ -11,6 +11,10 @@ export class MedicineSnapshotRepository implements IMedicineSnapshotRepository {
     private readonly repository: Repository<MedicineSnapshot>,
   ) {}
 
+  async findById(id: string): Promise<MedicineSnapshot | null> {
+    return this.repository.findOne({ where: { id } });
+  }
+
   async findByMedicineCode(
     medicineCode: string,
   ): Promise<MedicineSnapshot | null> {
@@ -26,13 +30,13 @@ export class MedicineSnapshotRepository implements IMedicineSnapshotRepository {
   }
 
   async update(
-    medicineCode: string,
+    id: string,
     data: Partial<MedicineSnapshot>,
   ): Promise<MedicineSnapshot> {
-    await this.repository.update({ medicineCode }, data);
-    const updated = await this.findByMedicineCode(medicineCode);
+    await this.repository.update({ id }, data);
+    const updated = await this.findById(id);
     if (!updated) {
-      throw new Error(`MedicineSnapshot with code ${medicineCode} not found`);
+      throw new Error(`MedicineSnapshot with id ${id} not found`);
     }
     return updated;
   }

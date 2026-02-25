@@ -4,17 +4,10 @@ import {
   type IMedicineSnapshotRepository,
 } from '../domain/ports/medicinesnapshot.repository.interface';
 import { MedicineSnapshot } from '../domain/medicinesnapshot.entity';
+import { CreateMedicineSnapshotDto } from '../presentation/dto/create-medicine.dto';
+import { UpdateMedicineSnapshotDto } from '../presentation/dto/update-medicine.dto';
 
-export interface CreateMedicineSnapshotDto {
-  medicineCode: string;
-  medicineName_en?: string;
-  medicineName_th?: string;
-}
 
-export interface UpdateMedicineSnapshotDto {
-  medicineName_en?: string;
-  medicineName_th?: string;
-}
 
 @Injectable()
 export class MedicineSnapshotService {
@@ -25,33 +18,27 @@ export class MedicineSnapshotService {
     private readonly medicineSnapshotRepository: IMedicineSnapshotRepository,
   ) {}
 
-  async createOrUpdate(
-    dto: CreateMedicineSnapshotDto,
-  ): Promise<MedicineSnapshot> {
-    const existing = await this.medicineSnapshotRepository.findByMedicineCode(
-      dto.medicineCode,
-    );
-
-    if (existing) {
-      this.logger.log(
-        `Updating existing MedicineSnapshot for code: ${dto.medicineCode}`,
-      );
-      return this.medicineSnapshotRepository.update(dto.medicineCode, {
-        medicineName_en: dto.medicineName_en ?? null,
-        medicineName_th: dto.medicineName_th ?? null,
-      });
-    }
-
-    this.logger.log(
-      `Creating new MedicineSnapshot for code: ${dto.medicineCode}`,
-    );
+  async create(dto: CreateMedicineSnapshotDto): Promise<MedicineSnapshot> {
+    this.logger.log(`Creating new MedicineSnapshot for code: ${dto.medicineCode}`);
+    
     const medicineSnapshot = this.medicineSnapshotRepository.create({
+      id: dto.id,
       medicineCode: dto.medicineCode,
       medicineName_en: dto.medicineName_en ?? null,
       medicineName_th: dto.medicineName_th ?? null,
     });
 
     return this.medicineSnapshotRepository.save(medicineSnapshot);
+  }
+
+  async update(dto: UpdateMedicineSnapshotDto): Promise<MedicineSnapshot> {
+    this.logger.log(`Updating existing MedicineSnapshot with id: ${dto.id}`);
+    
+    return this.medicineSnapshotRepository.update(dto.id, {
+      medicineCode: dto.medicineCode,
+      medicineName_en: dto.medicineName_en ?? null,
+      medicineName_th: dto.medicineName_th ?? null,
+    });
   }
 
   async findByMedicineCode(
