@@ -18,16 +18,11 @@ export class Shelf extends BaseEntity {
   @JoinColumn({ name: 'rack_id' })
   rack: Rack;
 
-  @Column({
-    name: 'medicine_code',
-    type: 'varchar',
-    length: 255,
-    nullable: true,
-  })
-  medicineCode: string | null;
+  @Column({ name: 'medicine_snapshot_id', type: 'uuid', nullable: true })
+  medicineSnapshotId: string | null;
 
   @ManyToOne(() => MedicineSnapshot, { nullable: true })
-  @JoinColumn({ name: 'medicine_code', referencedColumnName: 'medicineCode' })
+  @JoinColumn({ name: 'medicine_snapshot_id' })
   medicineSnapshot: MedicineSnapshot | null;
 
   @Column({ name: 'capacity', type: 'int', nullable: true })

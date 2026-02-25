@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindManyOptions, IsNull, Repository } from 'typeorm';
+import { FindOptionsWhere, IsNull, Repository } from 'typeorm';
 import { Shelf } from '../domain/shelf.entity';
 import { IShelfRepository } from '../domain/ports/shelf.repository.interface';
-import { Rack } from '../../rack/domain/rack.entity';
-import { Zone } from '../../zone/domain/zone.entity';
 
 @Injectable()
 export class ShelfRepository implements IShelfRepository {
@@ -14,18 +12,61 @@ export class ShelfRepository implements IShelfRepository {
   ) {}
 
   findById(id: string): Promise<Shelf | null> {
-    return this.repository.findOneBy({ id });
+    return this.repository.findOne({
+      where: { id },
+      relations: {
+        medicineSnapshot: true,
+        rack: {
+          zone: {
+            room: true,
+          },
+        },
+      },
+    });
   }
 
-  findAndCount(options: FindManyOptions<Shelf>): Promise<[Shelf[], number]> {
-    return this.repository.findAndCount(options);
+  async findWithPagination(
+    filters: {
+      name?: string;
+      rackId?: string;
+      medicineSnapshotId?: string;
+    },
+    page: number,
+    limit: number,
+  ): Promise<[Shelf[], number]> {
+
+    const where: FindOptionsWhere<Shelf> = {};
+
+    if (filters.name) {
+      where.name = filters.name;
+    }
+
+    if (filters.rackId) {
+      where.rackId = filters.rackId;
+    }
+
+    if (filters.medicineSnapshotId) {
+      where.medicineSnapshotId = filters.medicineSnapshotId;
+    }
+
+    return this.repository.findAndCount({
+      where,
+      relations: {
+        medicineSnapshot: true,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
   }
 
   async findAvailableInRoom(roomId: string): Promise<Shelf | null> {
     return this.repository.findOne({
       where: {
-        medicineCode: IsNull(),
         deletedAt: IsNull(),
+        medicineSnapshotId: IsNull(), // Find shelf with no medicine assigned
         rack: {
           deletedAt: IsNull(),
           zone: {
@@ -37,6 +78,7 @@ export class ShelfRepository implements IShelfRepository {
         },
       },
       relations: {
+        medicineSnapshot: true,
         rack: {
           zone: {
             room: true,

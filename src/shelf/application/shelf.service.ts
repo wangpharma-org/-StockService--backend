@@ -2,6 +2,7 @@ import {
   HttpStatus,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import {
@@ -33,7 +34,7 @@ export class ShelfService {
       name: dto.name,
       description: dto.description ?? null,
       rackId: dto.rackId,
-      medicineCode: dto.medicineCode ?? null,
+      medicineSnapshotId: dto.medicineSnapshotId ?? null,
       capacity: dto.capacity ?? null,
       quantity: dto.quantity ?? 0,
     });
@@ -41,25 +42,19 @@ export class ShelfService {
     return this.shelfRepository.save(shelf);
   }
 
-  async findAll(
-    query: FindShelvesQueryDto,
-  ): Promise<{ data: Shelf[]; meta: PaginationMeta }> {
-    const { page, limit, name, rackId, medicineCode } = query;
-    const { skip, take } = buildPaginationOptions(page, limit);
+  async findAll(query: FindShelvesQueryDto) {
+    const { page, limit, ...filters } = query;
 
-    const where: FindOptionsWhere<Shelf> = {};
-    if (name) where.name = name;
-    if (rackId) where.rackId = rackId;
-    if (medicineCode) where.medicineCode = medicineCode;
+    const [data, total] = await this.shelfRepository.findWithPagination(
+      filters,
+      page,
+      limit,
+    );
 
-    const [data, total] = await this.shelfRepository.findAndCount({
-      where,
-      skip,
-      take,
-      order: { createdAt: 'DESC' },
-    });
-
-    return { data, meta: buildPaginationMeta(total, page, limit) };
+    return {
+      data,
+      meta: buildPaginationMeta(total, page, limit),
+    };
   }
 
   async findById(id: string): Promise<Shelf> {
@@ -82,8 +77,8 @@ export class ShelfService {
     if (dto.description !== undefined)
       shelf.description = dto.description ?? null;
     if (dto.rackId !== undefined) shelf.rackId = dto.rackId;
-    if (dto.medicineCode !== undefined)
-      shelf.medicineCode = dto.medicineCode ?? null;
+    if (dto.medicineSnapshotId !== undefined)
+      shelf.medicineSnapshotId = dto.medicineSnapshotId ?? null;
     if (dto.capacity !== undefined) shelf.capacity = dto.capacity ?? null;
     if (dto.quantity !== undefined) shelf.quantity = dto.quantity;
 
@@ -96,12 +91,14 @@ export class ShelfService {
   }
 
   async createDefaultShelfForNewProduct(dto: {
+    medicineId: string;
     medicineCode: string;
     roomId: string;
     medicineName_en?: string;
     medicineName_th?: string;
   }): Promise<Shelf> {
-    await this.medicineSnapshotService.createOrUpdate({
+    await this.medicineSnapshotService.create({
+      id: dto.medicineId,
       medicineCode: dto.medicineCode,
       medicineName_en: dto.medicineName_en,
       medicineName_th: dto.medicineName_th,
@@ -112,7 +109,7 @@ export class ShelfService {
     );
 
     if (available) {
-      available.medicineCode = dto.medicineCode;
+      available.medicineSnapshotId = dto.medicineId;
       return this.shelfRepository.save(available);
     }
 
@@ -129,7 +126,7 @@ export class ShelfService {
       name: `Medicine ${dto.medicineCode}`,
       description: null,
       rackId,
-      medicineCode: dto.medicineCode,
+      medicineSnapshotId: dto.medicineId,
       capacity: null,
       quantity: 0,
     });
