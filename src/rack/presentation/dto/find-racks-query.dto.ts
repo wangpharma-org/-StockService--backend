@@ -10,7 +10,12 @@ export class FindRacksQueryDto {
   @Type(() => Number)
   page: number = 1;
 
-  @ApiPropertyOptional({ example: 10, type: 'number', minimum: 1, maximum: 100 })
+  @ApiPropertyOptional({
+    example: 10,
+    type: 'number',
+    minimum: 1,
+    maximum: 100,
+  })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -23,7 +28,10 @@ export class FindRacksQueryDto {
   @IsString()
   name?: string;
 
-  @ApiPropertyOptional({ example: '123e4567-e89b-12d3-a456-426614174000', type: 'string' })
+  @ApiPropertyOptional({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    type: 'string',
+  })
   @IsOptional()
   @IsUUID('4')
   zoneId?: string;

@@ -45,10 +45,7 @@ export class ShelfController {
 
   @ApiOperation({ summary: 'Update shelf' })
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateShelfDto,
-  ): Promise<Shelf> {
+  update(@Param('id') id: string, @Body() dto: UpdateShelfDto): Promise<Shelf> {
     return this.shelfService.update(id, dto);
   }
 

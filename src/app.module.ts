@@ -10,6 +10,7 @@ import { RoomModule } from './room/room.module';
 import { ZoneModule } from './zone/zone.module';
 import { RackModule } from './rack/rack.module';
 import { ShelfModule } from './shelf/shelf.module';
+import { MedicineSnapshotModule } from './medicinesnapshot/medicinesnapshot.module';
 import { StockModule } from './stock/stock.module';
 
 @Module({
@@ -38,6 +39,7 @@ import { StockModule } from './stock/stock.module';
     ZoneModule,
     RackModule,
     ShelfModule,
+    MedicineSnapshotModule,
     StockModule,
   ],
   controllers: [AppController],

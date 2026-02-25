@@ -73,7 +73,8 @@ export class ZoneService {
     const zone = await this.findById(id);
 
     if (dto.name !== undefined) zone.name = dto.name;
-    if (dto.description !== undefined) zone.description = dto.description ?? null;
+    if (dto.description !== undefined)
+      zone.description = dto.description ?? null;
     if (dto.roomId !== undefined) zone.roomId = dto.roomId;
 
     return this.zoneRepository.save(zone);

@@ -6,9 +6,10 @@ import { ShelfEventsConsumer } from './presentation/shelf-events.consumer';
 import { ShelfService } from './application/shelf.service';
 import { ShelfRepository } from './infrastructure/shelf.repository';
 import { SHELF_REPOSITORY } from './domain/ports/shelf.repository.interface';
+import { MedicineSnapshotModule } from '../medicinesnapshot/medicinesnapshot.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Shelf])],
+  imports: [TypeOrmModule.forFeature([Shelf]), MedicineSnapshotModule],
   controllers: [ShelfController, ShelfEventsConsumer],
   providers: [
     ShelfService,

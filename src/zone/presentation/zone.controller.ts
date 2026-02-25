@@ -45,10 +45,7 @@ export class ZoneController {
 
   @ApiOperation({ summary: 'Update zone' })
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateZoneDto,
-  ): Promise<Zone> {
+  update(@Param('id') id: string, @Body() dto: UpdateZoneDto): Promise<Zone> {
     return this.zoneService.update(id, dto);
   }
 

@@ -10,21 +10,22 @@ import { Transport } from '@nestjs/microservices/enums/transport.enum';
 import { ClientsModule } from '@nestjs/microservices/module/clients.module';
 @Module({
   // Stock has no own table — it queries Shelf data directly
-  imports: [TypeOrmModule.forFeature([Shelf]),
+  imports: [
+    TypeOrmModule.forFeature([Shelf]),
     ClientsModule.register([
-        {
-            name: 'KAFKA_SERVICE',
-            transport: Transport.KAFKA,
-            options: {
-            client: {
-                clientId: 'medicine-service',
-                brokers: ['localhost:9092'],
-            },
-            producerOnlyMode: true,
-            },
+      {
+        name: 'KAFKA_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: 'medicine-service',
+            brokers: ['localhost:9092'],
+          },
+          producerOnlyMode: true,
         },
+      },
     ]),
- ],
+  ],
   controllers: [StockController, StockEventsConsumer],
   providers: [
     StockService,
@@ -33,4 +34,3 @@ import { ClientsModule } from '@nestjs/microservices/module/clients.module';
   exports: [StockService],
 })
 export class StockModule {}
-

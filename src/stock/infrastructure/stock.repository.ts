@@ -20,8 +20,16 @@ export class StockRepository implements IStockRepository {
     const result = await this.shelfRepository
       .createQueryBuilder('shelf')
       .select('COALESCE(SUM(shelf.quantity), 0)', 'total')
-      .innerJoin(Rack, 'rack', 'rack.id = shelf.rack_id AND rack.deleted_at IS NULL')
-      .innerJoin(Zone, 'zone', 'zone.id = rack.zone_id AND zone.deleted_at IS NULL')
+      .innerJoin(
+        Rack,
+        'rack',
+        'rack.id = shelf.rack_id AND rack.deleted_at IS NULL',
+      )
+      .innerJoin(
+        Zone,
+        'zone',
+        'zone.id = rack.zone_id AND zone.deleted_at IS NULL',
+      )
       .where('shelf.medicineCode = :medicineCode', { medicineCode: medicineId })
       .andWhere('zone.room_id = :roomId', { roomId })
       .andWhere('shelf.deleted_at IS NULL')
@@ -30,4 +38,3 @@ export class StockRepository implements IStockRepository {
     return Number(result?.total ?? 0);
   }
 }
-

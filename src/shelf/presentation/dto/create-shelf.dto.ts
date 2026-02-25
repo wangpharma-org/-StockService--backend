@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsInt,
   IsNotEmpty,
@@ -7,6 +8,7 @@ import {
   IsUUID,
   MaxLength,
   Min,
+  ValidateNested,
 } from 'class-validator';
 
 export class CreateShelfDto {
@@ -21,7 +23,10 @@ export class CreateShelfDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', type: 'string' })
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    type: 'string',
+  })
   @IsUUID('4')
   @IsNotEmpty()
   rackId: string;
@@ -44,14 +49,42 @@ export class CreateShelfDto {
   quantity?: number;
 }
 
-export class CreateDefaultShelfForNewProductDto {
-    @ApiProperty({ example: 'MED-001', type: 'string' })
-    @IsString()
-    @IsNotEmpty()
-    medicineCode: string;
+export class MedicineInfoDto {
+  @ApiProperty({ example: 'MED-001', type: 'string' })
+  @IsString()
+  @IsNotEmpty()
+  medicineCode: string;
 
-    @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', type: 'string' })
-    @IsUUID('4')
-    @IsNotEmpty()
-    roomId: string;
+  @ApiPropertyOptional({ example: 'Paracetamol', type: 'string' })
+  @IsOptional()
+  @IsString()
+  medicineName_en?: string;
+
+  @ApiPropertyOptional({ example: 'พาราเซตามอล', type: 'string' })
+  @IsOptional()
+  @IsString()
+  medicineName_th?: string;
+}
+
+export class CreateDefaultShelfForNewProductDto {
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    type: 'string',
+  })
+  @IsUUID('4')
+  @IsNotEmpty()
+  medicineId: string;
+
+  @ApiProperty({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    type: 'string',
+  })
+  @IsUUID('4')
+  @IsNotEmpty()
+  roomId: string;
+
+  @ApiProperty({ type: MedicineInfoDto })
+  @ValidateNested()
+  @Type(() => MedicineInfoDto)
+  info: MedicineInfoDto;
 }

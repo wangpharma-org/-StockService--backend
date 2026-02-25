@@ -45,10 +45,7 @@ export class RoomController {
 
   @ApiOperation({ summary: 'Update room' })
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateRoomDto,
-  ): Promise<Room> {
+  update(@Param('id') id: string, @Body() dto: UpdateRoomDto): Promise<Room> {
     return this.roomService.update(id, dto);
   }
 

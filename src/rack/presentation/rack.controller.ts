@@ -45,10 +45,7 @@ export class RackController {
 
   @ApiOperation({ summary: 'Update rack' })
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateRackDto,
-  ): Promise<Rack> {
+  update(@Param('id') id: string, @Body() dto: UpdateRackDto): Promise<Rack> {
     return this.rackService.update(id, dto);
   }
 

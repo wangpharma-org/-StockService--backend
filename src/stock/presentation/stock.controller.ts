@@ -8,10 +8,11 @@ import { CheckStockDto, StockCheckResultDto } from './dto/check-stock.dto';
 export class StockController {
   constructor(private readonly stockService: StockService) {}
 
-  @ApiOperation({ summary: 'Check if prescription items have sufficient stock in a room' })
+  @ApiOperation({
+    summary: 'Check if prescription items have sufficient stock in a room',
+  })
   @Post('check')
   checkStock(@Body() dto: CheckStockDto): Promise<StockCheckResultDto> {
     return this.stockService.checkStock(dto);
   }
 }
-

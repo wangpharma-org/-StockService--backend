@@ -115,7 +115,8 @@ export class RoomService {
     const room = await this.findById(id);
 
     if (dto.name !== undefined) room.name = dto.name;
-    if (dto.description !== undefined) room.description = dto.description ?? null;
+    if (dto.description !== undefined)
+      room.description = dto.description ?? null;
 
     return this.roomRepository.save(room);
   }

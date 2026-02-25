@@ -19,10 +19,11 @@ export class StockService {
   async checkStock(dto: CheckStockDto): Promise<StockCheckResultDto> {
     const results: StockCheckItemResultDto[] = await Promise.all(
       dto.items.map(async (item) => {
-        const availableQuantity = await this.stockRepository.sumQuantityByMedicineInRoom(
-          item.medicineCode,
-          dto.roomId,
-        );
+        const availableQuantity =
+          await this.stockRepository.sumQuantityByMedicineInRoom(
+            item.medicineCode,
+            dto.roomId,
+          );
 
         return {
           medicineCode: item.medicineCode,
@@ -40,4 +41,3 @@ export class StockService {
     };
   }
 }
-

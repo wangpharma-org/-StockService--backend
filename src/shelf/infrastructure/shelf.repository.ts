@@ -23,59 +23,59 @@ export class ShelfRepository implements IShelfRepository {
 
   async findAvailableInRoom(roomId: string): Promise<Shelf | null> {
     return this.repository.findOne({
-        where: {
+      where: {
         medicineCode: IsNull(),
         deletedAt: IsNull(),
         rack: {
-            deletedAt: IsNull(),
-            zone: {
+          deletedAt: IsNull(),
+          zone: {
             deletedAt: IsNull(),
             room: {
-                id: roomId,
+              id: roomId,
             },
-            },
+          },
         },
-        },
-        relations: {
+      },
+      relations: {
         rack: {
-            zone: {
+          zone: {
             room: true,
-            },
+          },
         },
-        },
+      },
     });
-    }
+  }
 
   async findAnyRackIdInRoom(roomId: string): Promise<string | null> {
     const shelf = await this.repository.findOne({
-        select: {
+      select: {
         rack: {
-            id: true,
+          id: true,
         },
-        },
-        where: {
+      },
+      where: {
         deletedAt: IsNull(),
         rack: {
-            deletedAt: IsNull(),
-            zone: {
+          deletedAt: IsNull(),
+          zone: {
             deletedAt: IsNull(),
             room: {
-                id: roomId,
+              id: roomId,
             },
-            },
+          },
         },
-        },
-        relations: {
+      },
+      relations: {
         rack: {
-            zone: {
+          zone: {
             room: true,
-            },
+          },
         },
-        },
+      },
     });
 
     return shelf?.rack?.id ?? null;
-    }
+  }
 
   create(data: Partial<Shelf>): Shelf {
     return this.repository.create(data);

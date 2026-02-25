@@ -9,7 +9,7 @@ import {
   type IShelfRepository,
 } from '../domain/ports/shelf.repository.interface';
 import { Shelf } from '../domain/shelf.entity';
-import { CreateDefaultShelfForNewProductDto, CreateShelfDto } from '../presentation/dto/create-shelf.dto';
+import { CreateShelfDto } from '../presentation/dto/create-shelf.dto';
 import { UpdateShelfDto } from '../presentation/dto/update-shelf.dto';
 import { FindShelvesQueryDto } from '../presentation/dto/find-shelves-query.dto';
 import {
@@ -18,12 +18,14 @@ import {
   PaginationMeta,
 } from '../../common/utils/pagination.util';
 import { FindOptionsWhere } from 'typeorm';
+import { MedicineSnapshotService } from '../../medicinesnapshot/application/medicinesnapshot.service';
 
 @Injectable()
 export class ShelfService {
   constructor(
     @Inject(SHELF_REPOSITORY)
     private readonly shelfRepository: IShelfRepository,
+    private readonly medicineSnapshotService: MedicineSnapshotService,
   ) {}
 
   async create(dto: CreateShelfDto): Promise<Shelf> {
@@ -77,9 +79,11 @@ export class ShelfService {
     const shelf = await this.findById(id);
 
     if (dto.name !== undefined) shelf.name = dto.name;
-    if (dto.description !== undefined) shelf.description = dto.description ?? null;
+    if (dto.description !== undefined)
+      shelf.description = dto.description ?? null;
     if (dto.rackId !== undefined) shelf.rackId = dto.rackId;
-    if (dto.medicineCode !== undefined) shelf.medicineCode = dto.medicineCode ?? null;
+    if (dto.medicineCode !== undefined)
+      shelf.medicineCode = dto.medicineCode ?? null;
     if (dto.capacity !== undefined) shelf.capacity = dto.capacity ?? null;
     if (dto.quantity !== undefined) shelf.quantity = dto.quantity;
 
@@ -91,8 +95,21 @@ export class ShelfService {
     await this.shelfRepository.softDelete(id);
   }
 
-  async createDefaultShelfForNewProduct(dto: CreateDefaultShelfForNewProductDto): Promise<Shelf> {
-    const available = await this.shelfRepository.findAvailableInRoom(dto.roomId);
+  async createDefaultShelfForNewProduct(dto: {
+    medicineCode: string;
+    roomId: string;
+    medicineName_en?: string;
+    medicineName_th?: string;
+  }): Promise<Shelf> {
+    await this.medicineSnapshotService.createOrUpdate({
+      medicineCode: dto.medicineCode,
+      medicineName_en: dto.medicineName_en,
+      medicineName_th: dto.medicineName_th,
+    });
+
+    const available = await this.shelfRepository.findAvailableInRoom(
+      dto.roomId,
+    );
 
     if (available) {
       available.medicineCode = dto.medicineCode;
@@ -119,6 +136,4 @@ export class ShelfService {
 
     return this.shelfRepository.save(shelf);
   }
-
-
 }

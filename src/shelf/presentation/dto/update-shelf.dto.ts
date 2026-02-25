@@ -1,5 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, IsUUID, MaxLength, Min } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class UpdateShelfDto {
   @ApiPropertyOptional({ example: 'Shelf S2', type: 'string' })
@@ -13,7 +20,10 @@ export class UpdateShelfDto {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ example: '123e4567-e89b-12d3-a456-426614174000', type: 'string' })
+  @ApiPropertyOptional({
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    type: 'string',
+  })
   @IsOptional()
   @IsUUID('4')
   rackId?: string;

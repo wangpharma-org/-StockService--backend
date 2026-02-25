@@ -73,7 +73,8 @@ export class RackService {
     const rack = await this.findById(id);
 
     if (dto.name !== undefined) rack.name = dto.name;
-    if (dto.description !== undefined) rack.description = dto.description ?? null;
+    if (dto.description !== undefined)
+      rack.description = dto.description ?? null;
     if (dto.zoneId !== undefined) rack.zoneId = dto.zoneId;
 
     return this.rackRepository.save(rack);
