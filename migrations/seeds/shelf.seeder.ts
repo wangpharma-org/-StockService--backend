@@ -50,7 +50,6 @@ export class ShelfSeeder {
             rackId: rack.id,
             capacity: data.capacity,
             quantity: 0,
-            medicineCode: null,
           }),
         );
         console.log(`  Created shelf: ${data.name} (${rack.name})`);

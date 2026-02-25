@@ -1,6 +1,15 @@
-import { MedicineInfoDto } from "src/shelf/presentation/dto/create-shelf.dto";
+export interface UpdateMedicineSnapshotDto {
+  id: string;
+  medicineCode?: string;
+  medicineName_en?: string;
+  medicineName_th?: string;
+}
 
-export class UpdateMedicineDto {
-    medicineId: string;
-    info: MedicineInfoDto;
+export interface MedicineUpdatedEventDto {
+  medicineId: string;
+  info: {
+    medicineCode: string;
+    medicineName_en?: string;
+    medicineName_th?: string;
+  };
 }
