@@ -1,4 +1,4 @@
-import { Controller, Inject } from '@nestjs/common';
+import { Controller, Inject, Logger } from '@nestjs/common';
 import { ClientKafka, EventPattern, Payload } from '@nestjs/microservices';
 import { StockService } from '../application/stock.service';
 
@@ -13,7 +13,7 @@ export class StockEventsConsumer {
   @EventPattern('prescription.created.v1')
   async checkStockWhenPrescriptionCreated(@Payload() message: any) {
     const { prescriptionId, roomId, items } = message;
-
+    
     const result = await this.stockService.checkStock({
       prescriptionId,
       roomId,
@@ -25,7 +25,5 @@ export class StockEventsConsumer {
       reserveStatus: result.allSufficient ? 'RESERVED' : 'FAILED',
     });
 
-    // optional: emit to notification if stock is insufficient
-    // ...
   }
 }

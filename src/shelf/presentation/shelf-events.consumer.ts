@@ -13,7 +13,7 @@ export class ShelfEventsConsumer {
     @Payload() message: CreateDefaultShelfForNewProductDto,
   ) {
     const { medicineId, roomId, info } = message;
-
+    
     try{ 
       await this.shelfService.createDefaultShelfForNewProduct({
         medicineId: medicineId,
