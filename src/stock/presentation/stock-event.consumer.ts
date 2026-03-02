@@ -22,7 +22,7 @@ export class StockEventsConsumer {
 
     await this.kafkaClient.emit('stock.reserved.v1', {
       prescriptionId,
-      reserveStatus: result.allSufficient ? 'RESERVED' : 'FAILED',
+      reserveStatus: result.allSufficient ? 'reserved' : 'failed',
     });
 
   }

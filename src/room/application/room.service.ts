@@ -22,6 +22,7 @@ import { FindOptionsWhere } from 'typeorm';
 import { ZoneService } from '../../zone/application/zone.service';
 import { RackService } from '../../rack/application/rack.service';
 import { ShelfService } from '../../shelf/application/shelf.service';
+import { ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
 export class RoomService {
@@ -33,6 +34,8 @@ export class RoomService {
     private readonly zoneService: ZoneService,
     private readonly rackService: RackService,
     private readonly shelfService: ShelfService,
+    @Inject('KAFKA_SERVICE')
+    private readonly kafkaClient: ClientKafka,
   ) {}
 
   async create(dto: CreateRoomDto): Promise<Room> {
@@ -45,6 +48,13 @@ export class RoomService {
 
     // Create default Zone → Rack → Shelf for every new room
     await this.createDefaults(savedRoom);
+
+    await this.kafkaClient.emit('room.created.v1', {
+      roomId: savedRoom.id,
+      roomName: savedRoom.name,
+      roomDescription: savedRoom.description,
+      snapshotDate: new Date().toISOString(),
+    });
 
     return savedRoom;
   }
@@ -118,11 +128,23 @@ export class RoomService {
     if (dto.description !== undefined)
       room.description = dto.description ?? null;
 
-    return this.roomRepository.save(room);
+    const updatedRoom = await this.roomRepository.save(room);
+
+    await this.kafkaClient.emit('room.updated.v1', {
+      roomId: updatedRoom.id,
+      roomName: updatedRoom.name,
+      roomDescription: updatedRoom.description,
+    });
+
+    return updatedRoom;
   }
 
   async remove(id: string): Promise<void> {
     await this.findById(id);
     await this.roomRepository.softDelete(id);
+
+    await this.kafkaClient.emit('room.deleted.v1', {
+      roomId: id,
+    });
   }
 }

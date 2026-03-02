@@ -8,6 +8,7 @@ import { ROOM_REPOSITORY } from './domain/ports/room.repository.interface';
 import { ZoneModule } from '../zone/zone.module';
 import { RackModule } from '../rack/rack.module';
 import { ShelfModule } from '../shelf/shelf.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -15,6 +16,19 @@ import { ShelfModule } from '../shelf/shelf.module';
     ZoneModule,
     RackModule,
     ShelfModule,
+    ClientsModule.register([
+      {
+        name: 'KAFKA_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: 'medicine-service',
+            brokers: ['localhost:9092'],
+          },
+          producerOnlyMode: true,
+        },
+      },
+    ]),
   ],
   controllers: [RoomController],
   providers: [
